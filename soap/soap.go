@@ -35,6 +35,7 @@ type SOAPEnvelope struct {
 	XmlNS     string   `xml:"xmlns:soapenv,attr"`
 	XmlNSISB  string   `xml:"xmlns:isb,attr"`
 	XmlNSISB1 string   `xml:"xmlns:isb1,attr"`
+	XmlNSSCG  string   `xml:"xmlns:scg,attr"`
 
 	Header *SOAPHeader
 	Body   SOAPBody
