@@ -31,11 +31,12 @@ type SOAPEnvelopeResponse struct {
 }
 
 type SOAPEnvelope struct {
-	XMLName   xml.Name `xml:"soapenv:Envelope"`
-	XmlNS     string   `xml:"xmlns:soapenv,attr"`
-	XmlNSISB  string   `xml:"xmlns:isb,attr,omitempty"`
-	XmlNSISB1 string   `xml:"xmlns:isb1,attr,omitempty"`
-	XmlNSSCG  string   `xml:"xmlns:scg,attr,omitempty"`
+	XMLName xml.Name `xml:"soapenv:Envelope"`
+	//Attr      interface{} `xml:",omitempty"`
+	XmlNS     string `xml:"xmlns:soapenv,attr"`
+	XmlNSISB  string `xml:"xmlns:isb,attr,omitempty"`
+	XmlNSISB1 string `xml:"xmlns:isb1,attr,omitempty"`
+	XmlNSSCG  string `xml:"xmlns:scg,attr,omitempty"`
 
 	Header *SOAPHeader
 	Body   SOAPBody

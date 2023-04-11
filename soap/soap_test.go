@@ -69,7 +69,9 @@ func TestClient_Call(t *testing.T) {
 	client := NewClient(ts.URL)
 	req := &Ping{Request: &PingRequest{Message: "Hi"}}
 	reply := &PingResponse{}
-	if err := client.Call("GetData", req, reply); err != nil {
+	if err := client.Call("GetData", req, reply, SOAPEnvelope{
+		XmlNS: XmlNsSoapEnv,
+	}); err != nil {
 		t.Fatalf("couln't call service: %v", err)
 	}
 
@@ -122,7 +124,9 @@ func TestClient_Send_Correct_Headers(t *testing.T) {
 		client := NewClient(ts.URL, WithHTTPHeaders(test.reqHeaders))
 		req := struct{}{}
 		reply := struct{}{}
-		client.Call(test.action, req, reply)
+		client.Call(test.action, req, reply, SOAPEnvelope{
+			XmlNS: XmlNsSoapEnv,
+		})
 
 		for k, v := range test.expectedHeaders {
 			h := gotHeaders.Get(k)
@@ -191,7 +195,9 @@ func TestClient_MTOM(t *testing.T) {
 	client := NewClient(ts.URL, WithMTOM())
 	req := &PingRequest{Attachment: NewBinary([]byte("Attached data")).SetContentType("text/plain")}
 	reply := &PingRequest{}
-	if err := client.Call("GetData", req, reply); err != nil {
+	if err := client.Call("GetData", req, reply, SOAPEnvelope{
+		XmlNS: XmlNsSoapEnv,
+	}); err != nil {
 		t.Fatalf("couln't call service: %v", err)
 	}
 
@@ -824,7 +830,9 @@ func TestHTTPError(t *testing.T) {
 			}))
 			defer ts.Close()
 			client := NewClient(ts.URL)
-			gotErr := client.Call("GetData", &Ping{}, &PingResponse{})
+			gotErr := client.Call("GetData", &Ping{}, &PingResponse{}, SOAPEnvelope{
+				XmlNS: XmlNsSoapEnv,
+			})
 			if test.wantErr {
 				if gotErr == nil {
 					t.Fatalf("Expected an error from call.  Received none")
@@ -850,5 +858,22 @@ func TestHTTPError(t *testing.T) {
 			}
 		})
 	}
+}
 
+func TestSOAPEnvelope(t *testing.T) {
+	e := SOAPEnvelope{
+		XmlNS:     "soapenv-",
+		XmlNSISB:  "isb-",
+		XmlNSISB1: "isb1-",
+		XmlNSSCG:  "scg-",
+	}
+	b, err := xml.Marshal(e)
+	if err != nil {
+		t.Error("marshal xml failed", err)
+	}
+
+	expected := `<soapenv:Envelope xmlns:soapenv="soapenv-" xmlns:isb="isb-" xmlns:isb1="isb1-" xmlns:scg="scg-"><soapenv:Body></soapenv:Body></soapenv:Envelope>`
+	if string(b) != expected {
+		t.Errorf("expected %s, but got %s", expected, string(b))
+	}
 }
